@@ -313,7 +313,7 @@ public class LGraph<V, E> {
 
         for (Map.Entry<Node<V, E>, LNode> entry : nodeMap.entrySet()) {
             LNode lnode = entry.getValue();
-            layout.addNode(entry.getKey(), new Point(lnode.getXPos(), lnode.getLayer() * config.getLayerDistance()));
+            layout.addNode(entry.getKey(), new Point(lnode.getLayer() * config.getLayerDistance(), lnode.getXPos()));
         }
 
         for (Map.Entry<Edge<V, E>, ArrayList<LNode>> entry : edgeMap.entrySet()) {
@@ -321,22 +321,19 @@ public class LGraph<V, E> {
             LNode lnode = entry.getValue().get(0);
             assert !lnode.isDummy();
             assert entry.getValue().size() > 1;
-            points.add(new Point(Math.max(lnode.getXPosLeft(), Math.min(lnode.getXPosRight(),
-                        lnode.getXPos() + (entry.getValue().get(1).getXPos() - lnode.getXPos()) * 0.5 * lnode.getHeight() / config.getLayerDistance())),
-                    lnode.getLayer() * config.getLayerDistance() + 0.5 * lnode.getHeight()));
+            points.add(new Point(lnode.getLayer() * config.getLayerDistance() + 0.5 * lnode.getHeight(),
+                    Math.max(lnode.getXPosLeft(), Math.min(lnode.getXPosRight(),
+                        lnode.getXPos() + (entry.getValue().get(1).getXPos() - lnode.getXPos()) * 0.5 * lnode.getHeight() / config.getLayerDistance()))));
             LNode prev = lnode;
             for (int i = 1; i < entry.getValue().size(); i++) {
                 lnode = entry.getValue().get(i);
-                /* points.add(new Point(lnode.getXPos(), lnode.getLayer() * config.getLayerDistance() +
-                        0.5 * (i == 0 ? 1 : -1) * (!lnode.isDummy() ? lnode.getHeight() : 0)));
-                        */
                 if (!lnode.isDummy()) {
                     assert i == entry.getValue().size() - 1;
-                    points.add(new Point(Math.max(lnode.getXPosLeft(), Math.min(lnode.getXPosRight(),
-                                lnode.getXPos() - (lnode.getXPos() - prev.getXPos()) * 0.5 * lnode.getHeight() / config.getLayerDistance())),
-                            lnode.getLayer() * config.getLayerDistance() - 0.5 * lnode.getHeight()));
+                    points.add(new Point(lnode.getLayer() * config.getLayerDistance() - 0.5 * lnode.getHeight(),
+                            Math.max(lnode.getXPosLeft(), Math.min(lnode.getXPosRight(),
+                                lnode.getXPos() - (lnode.getXPos() - prev.getXPos()) * 0.5 * lnode.getHeight() / config.getLayerDistance()))));
                 } else {
-                    points.add(new Point(lnode.getXPos(), lnode.getLayer() * config.getLayerDistance()));
+                    points.add(new Point(lnode.getLayer() * config.getLayerDistance(), lnode.getXPos()));
                 }
                 prev = lnode;
             }
